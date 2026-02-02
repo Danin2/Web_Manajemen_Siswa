@@ -2,15 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CSS Variables untuk Light & Dark Mode */
+/* CSS Variables untuk Light & Dark Mode - Gen Z Vibes */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0a0a0a;
+  
+  /* Modern Color Palette */
+  --primary: #7c3aed;      /* Purple */
+  --secondary: #ec4899;    /* Pink */
+  --accent: #06b6d4;       /* Cyan */
+  --success: #10b981;      /* Green */
+  --warning: #f59e0b;      /* Amber */
+  --danger: #ef4444;       /* Red */
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #030712;
+  --foreground: #f5f5f5;
 }
 
 /* Reset & Base Styles */
@@ -23,13 +31,43 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 /* Smooth transition saat ganti mode */
 body, 
 body * {
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Typography Utilities */
+@layer components {
+  .font-poppins {
+    @apply font-[family-name:var(--font-poppins)];
+  }
+  
+  .font-inter {
+    @apply font-[family-name:var(--font-inter)];
+  }
+
+  /* Gradient Text */
+  .text-gradient-purple {
+    @apply bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-cyan {
+    @apply bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent;
+  }
+
+  /* Glowing Effects */
+  .glow-purple {
+    @apply shadow-[0_0_20px_rgba(147,51,234,0.3)];
+  }
+
+  .glow-cyan {
+    @apply shadow-[0_0_20px_rgba(6,182,212,0.3)];
+  }
 }
 
 @keyframes slide-up {
@@ -43,6 +81,19 @@ body * {
   }
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
 }

@@ -5,8 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Task, SortOption, QuickFilter } from '@/lib/types';  // 👈 Import types baru
-import { loadTasks, saveTasks } from '@/lib/localStorage';
+import { Task, SortOption, QuickFilter } from '@/lib/types';
 import { sortTasks, applyQuickFilter } from '@/lib/sortHelpers';  // 👈 Import helpers
 import TaskCard from '@/components/TaskCard';
 import Modal from '@/components/Modal';
@@ -31,55 +30,55 @@ export default function TasksPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
-  // Load data dari LocalStorage
+  // Load data dari API (MongoDB)
   useEffect(() => {
-    const loadedTasks = loadTasks();
-    setTasks(loadedTasks);
-    setIsLoading(false);
+    let mounted = true;
+    async function fetchTasks() {
+      try {
+        const res = await fetch('/api/tasks');
+        const data = await res.json();
+        const normalized: Task[] = (data || []).map((t: any) => ({
+          id: t.id ?? t._id ?? String(t._id ?? ''),
+          title: t.title,
+          subject: t.subject,
+          deadline: t.dueDate ? new Date(t.dueDate).toISOString() : (t.deadline ?? ''),
+          priority: t.priority ?? 'Sedang',
+          isCompleted: t.isCompleted ?? (t.status === 'completed'),
+          createdAt: t.createdAt ? new Date(t.createdAt).toISOString() : (t.createdAt ?? ''),
+        }));
+        if (!mounted) return;
+        setTasks(normalized);
+      } catch (err) {
+        console.error('Error fetching tasks', err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    fetchTasks();
+    return () => { mounted = false; };
   }, []);
 
   // ========== HANDLER FUNCTIONS (Tetap sama) ==========
 
   const handleToggleComplete = (id: string) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
-    );
-    setTasks(updatedTasks);
-    saveTasks(updatedTasks);
+    alert('Untuk mengubah status tugas, silakan update data langsung lewat MongoDB Compass.');
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Yakin mau hapus tugas ini?')) {
-      const updatedTasks = tasks.filter(task => task.id !== id);
-      setTasks(updatedTasks);
-      saveTasks(updatedTasks);
-    }
+    alert('Untuk menghapus tugas, silakan hapus dokumen lewat MongoDB Compass.');
   };
 
   const handleAddNew = () => {
-    setEditingTask(undefined);
-    setIsModalOpen(true);
+    alert('Untuk menambah tugas, tambahkan dokumen di collection `tasks` lewat MongoDB Compass.');
   };
 
   const handleEdit = (task: Task) => {
-    setEditingTask(task);
-    setIsModalOpen(true);
+    alert('Untuk mengedit tugas, ubah dokumen di MongoDB Compass.');
   };
 
   const handleFormSubmit = (taskData: Task) => {
-    if (editingTask) {
-      const updatedTasks = tasks.map(task => 
-        task.id === taskData.id ? taskData : task
-      );
-      setTasks(updatedTasks);
-      saveTasks(updatedTasks);
-    } else {
-      const updatedTasks = [...tasks, taskData];
-      setTasks(updatedTasks);
-      saveTasks(updatedTasks);
-    }
-    setIsModalOpen(false);
-    setEditingTask(undefined);
+    alert('Form submission disabled. Use MongoDB Compass to add/edit tasks.');
   };
 
   const handleFormCancel = () => {
@@ -199,8 +198,8 @@ export default function TasksPage() {
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">Semua Mata Pelajaran</option>
-            {subjects.slice(1).map(subject => (
-              <option key={subject} value={subject}>{subject}</option>
+            {subjects.slice(1).map((subject, idx) => (
+              <option key={`subject-${idx}`} value={subject}>{subject}</option>
             ))}
           </select>
 

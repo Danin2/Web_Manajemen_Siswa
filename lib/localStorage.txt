@@ -138,9 +138,8 @@ export function getStorageSize(): number {
   let totalSize = 0;
   
   for (let key in localStorage) {
-    if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
-      // @ts-ignore
-      totalSize += (localStorage as any)[key].length + key.length;
+    if (localStorage.hasOwnProperty(key)) {
+      totalSize += localStorage[key].length + key.length;
     }
   }
   
